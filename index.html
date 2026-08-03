@@ -335,7 +335,7 @@
     <p style="font-size:16px;margin-bottom:18px">If this gave you something, here are a few ways to pay it forward — only one costs a cent, and it's listed last on purpose.</p>
     <div class="clargrid">
       <button class="ghost" type="button" onclick="clarFeedback()">Leave feedback</button>
-      <button class="ghost" type="button" onclick="clarShare()">Tell one person who'd appreciate it</button>
+      <button class="ghost" type="button" onclick="clarShare()">Share it with one person</button>
       <button class="ghost" type="button" onclick="clarConfusing()">Report something confusing</button>
       <button class="ghost" type="button" onclick="clarDonate()">Support development</button>
     </div>
@@ -1002,7 +1002,7 @@ function coverCanvas(){
   const lh=(size+4)*1.5;
   const groupTop=Math.max(540,800-(70+(lines.length-1)*lh)/2);
   x.fillStyle='#566052';x.font='600 22px Helvetica, Arial, sans-serif';
-  x.fillText('I WANT TECHNOLOGY TO FEEL LIKE',W/2,groupTop);
+  x.fillText('HOW I WANT TECHNOLOGY TO FEEL',W/2,groupTop);
   let y=groupTop+70;
   x.fillStyle='#1a201b';x.font='italic '+(size+4)+'px Georgia, serif';
   lines.forEach(l=>{x.fillText(l,W/2,y);y+=lh;});
