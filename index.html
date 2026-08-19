@@ -238,8 +238,9 @@
   <div class="wordmark">Loema</div>
   <h1 style="font-size:30px">Make it yours.</h1>
   <p>Press and hold the mark for three seconds — keep your finger (or Enter key) down until the ring fills.</p>
-  <p class="hint">Tap it a few times, trace the ring — however you sign is yours. The rhythm and motion become part of your signature, kept coarsely (never fine detail), only inside your document. When the app arrives, they seed a mark that is uniquely yours.</p>
-  <p class="hint">Everything on this page lives in your browser's short-term memory and the file you download. Nothing is sent to Loema.</p>
+  <p class="hint">Tap it a few times, trace the ring — however you sign is yours.</p>
+  <label class="standby"><input type="checkbox" id="ringmemory"><span>Let how you sign — tap rhythm and ring tracing — become part of your signature. Kept in rounded steps, never fine detail, only inside your document. In the app, it helps shape a mark of your own.</span></label>
+  <p class="hint">Unchecked, your signature records only confirmation and the local time. Either way, everything on this page lives in your browser's short-term memory and the file you download. Nothing is sent to Loema.</p>
   <div class="sigwrap">
     <button type="button" id="sigil" aria-label="Press and hold for three seconds to witness your constitution">
       <svg viewBox="0 0 200 200" aria-hidden="true">
@@ -276,7 +277,7 @@
   <div class="hint" style="margin-top:2px">This cover can say you authored a personal constitution without exposing a single term inside it.</div>
   <div class="primary-choices">
     <button type="button" onclick="toggleKeep()" id="keepbtn" aria-expanded="false">Keep my constitution</button>
-    <button type="button" class="ghost" onclick="openFirstSteps()">Take my first step</button>
+    <button type="button" class="ghost" onclick="openFirstSteps('s-witness')">Take my first step</button>
   </div>
   <div id="keeppanel" style="display:none">
     <div class="dl" style="margin-top:6px">
@@ -313,7 +314,7 @@
   <div class="navrow wrap">
     <button type="button" onclick="copyAI()" id="ai-copy-btn">Copy AI preamble</button>
     <button class="ghost" type="button" onclick="dlPreamble()">Download AI preamble</button>
-    <button class="ghost" type="button" onclick="openFirstSteps()">Continue to first steps</button>
+    <button class="ghost" type="button" onclick="openFirstSteps('s-ai')">Continue to first steps</button>
   </div>
 </section>
 
@@ -334,10 +335,10 @@
     <h2>Contribute to clarity</h2>
     <p style="font-size:16px;margin-bottom:18px">If this gave you something, here are a few ways to pay it forward — only one costs a cent, and it's listed last on purpose.</p>
     <div class="clargrid">
-      <button class="ghost" type="button" onclick="clarFeedback()">Leave feedback</button>
-      <button class="ghost" type="button" onclick="clarShare()">Share it with one person</button>
-      <button class="ghost" type="button" onclick="clarConfusing()">Report something confusing</button>
-      <button class="ghost" type="button" onclick="clarDonate()">Support development</button>
+      <button class="ghost" type="button" onclick="clarShare()">Think of someone? Share.</button>
+      <button class="ghost" type="button" onclick="openClarity()">Help us understand.</button>
+      <button class="ghost" type="button" onclick="clarConfusing()">Found a problem? Report it.</button>
+      <button class="ghost" type="button" onclick="clarDonate()">Help build Loema.</button>
     </div>
     <div class="terms status" id="clarnote" role="status" style="color:var(--accent)"></div>
   </div>
@@ -354,6 +355,43 @@
   <div class="goodbye">That's everything. Go be where your feet are — the document will keep.</div>
 </section>
 
+<!-- ═══════════ HELP US UNDERSTAND — clarity analytics ═══════════ -->
+<section class="screen" id="s-clarity">
+  <div class="backbar"><button class="backbtn" type="button" data-back aria-label="Go back. Press and hold to choose an earlier page.">← Back</button></div>
+  <div class="wordmark">Loema</div>
+  <h1 style="font-size:30px">Help us understand.</h1>
+  <div class="purpose"><h3>Why we're asking</h3>
+    <p>Every answer below is optional. We ask these questions because we're trying to understand whether Loema creates clarity — not just whether it functions. Some answers may help improve future versions. Others simply help us understand where our assumptions were wrong. You can skip any question.</p>
+  </div>
+  <div class="mv"><h3>Before Loema, how clearly could you name what technology was displacing in your life?</h3>
+    <div class="navrow wrap" style="margin-top:10px" data-ca="before">
+      <button class="ghost" type="button">Clearly</button><button class="ghost" type="button">Vaguely</button><button class="ghost" type="button">Not at all</button>
+    </div></div>
+  <div class="mv"><h3>And now?</h3>
+    <div class="navrow wrap" style="margin-top:10px" data-ca="after">
+      <button class="ghost" type="button">Clearly</button><button class="ghost" type="button">Vaguely</button><button class="ghost" type="button">Still not</button>
+    </div></div>
+  <div class="mv"><h3>Did the thread we noticed fit you?</h3>
+    <div class="navrow wrap" style="margin-top:10px" data-ca="thread">
+      <button class="ghost" type="button">It fit</button><button class="ghost" type="button">Partly</button><button class="ghost" type="button">It missed</button>
+    </div></div>
+  <div class="mv"><h3>Where did you hesitate — and was the hesitation useful?</h3>
+    <textarea data-caf="hesitate" maxlength="600" placeholder="Skip freely…"></textarea></div>
+  <div class="mv"><h3>Did anything not sound like a person?</h3>
+    <textarea data-caf="voice" maxlength="600" placeholder="Quote it if you can…"></textarea></div>
+  <div class="mv"><h3>What did we assume about you that was wrong?</h3>
+    <textarea data-caf="assumption" maxlength="600" placeholder="This one teaches us the most…"></textarea></div>
+  <div class="mv"><h3>Will you open your constitution again?</h3>
+    <div class="navrow wrap" style="margin-top:10px" data-ca="return">
+      <button class="ghost" type="button">Yes, soon</button><button class="ghost" type="button">Someday</button><button class="ghost" type="button">Probably not</button>
+    </div></div>
+  <div class="navrow wrap">
+    <button type="button" onclick="claritySend()">Send what I answered</button>
+    <button class="ghost" type="button" onclick="clarityCopy()">Copy instead</button>
+  </div>
+  <div class="terms status" id="claritynote" role="status" style="color:var(--accent)"></div>
+</section>
+
 <dialog id="history-dialog" aria-labelledby="history-title">
   <div class="history-head">
     <h2 id="history-title">Go back to…</h2>
@@ -366,7 +404,7 @@
 // ————— STATE (in-memory only; nothing persists) —————
 const S = { register:'plain', P:null, Ptext:null, B:null, postures:{}, evidence:{}, q5:null,
             disposition:null, preamble:'', thread:'', threadSource:'inferred', threadVerdict:null,
-            authorName:'', articles:{}, answers:{}, maxIdx:0, started:false, witnessed:false, witnessedAt:null, ringMemory:null,
+            authorName:'', articles:{}, answers:{}, maxIdx:0, started:false, witnessed:false, witnessedAt:null, ringMemory:null, helpFrom:null,
             stageReached:{mirror:false,author:false,constitution:false,sign:false,witness:false,ai:false,help:false,steps:false} };
 
 const DOMS = ['feeds','data','attention','retention','sharing'];
@@ -390,7 +428,7 @@ const FLOW = [
   on:(i)=>{S.B=i;}},
  {id:'card1',card:()=>connectionCard()},
  {id:'q5',num:'Five',text:'Think about everything you saw online today. Who picked most of it?',
-  opts:['I did','“My” feed did','Half and half','…huh. I actually don’t know'],
+  opts:['I did','The algorithm','Half and half','…huh. I actually don’t know'],
   on:(i)=>{S.q5=i;}},
  {id:'q6',num:'Six',text:'However you answered — how does that sit with you?',
   opts:['Fine, honestly','It bothers me more than I usually admit','I’m not sure yet','Depends who’s doing the picking'],
@@ -717,6 +755,7 @@ function readyToSign(){
 let holdTimer=null,signed=false,taps=[],circles=[];
 let tracing=false,lastAng=null,sweep=0,traceStart=0;
 const sig=document.getElementById('sigil'),fill=document.getElementById('fillring');
+function ringOn(){const c=document.getElementById('ringmemory');return !!(c&&c.checked);}
 function angOf(e){const r=sig.getBoundingClientRect();
   const x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);
   return Math.atan2(y,x)*180/Math.PI;}
@@ -724,7 +763,7 @@ function beginHold(e){
   if(signed||holdTimer)return;
   if(e.type==='keydown'&&![' ','Enter'].includes(e.key))return;
   e.preventDefault();
-  if(e.type==='pointerdown'){taps.push(Date.now());
+  if(ringOn()&&e.type==='pointerdown'){taps.push(Date.now());
     tracing=true;lastAng=angOf(e);sweep=0;traceStart=Date.now();}
   sig.classList.add('holding');
   fill.style.transition='stroke-dashoffset 3s linear';fill.style.strokeDashoffset='0';
@@ -753,7 +792,7 @@ function anyAmended(){return DOMS.some(d=>S.articles[d]&&S.articles[d].amended)|
 function sealWord(){return anyAmended()?'ratified':'witnessed';}
 function ratify(){
   syncArticleEdits();S.witnessed=true;S.witnessedAt=new Date().toString();
-  S.ringMemory={hold_ms:3000,rhythm_ms:taps.slice(1).map((t,i)=>t-taps[i]),circles:circles.slice()};
+  S.ringMemory=ringOn()?{hold_ms:3000,rhythm_ms:taps.slice(1).map((t,i)=>Math.round((t-taps[i])/50)*50),circles:circles.slice()}:null;
   sig.classList.remove('holding');sig.classList.add('witnessed');
   const sn=document.getElementById('signote');sn.textContent='⦿  '+sealWord()+'.';sn.style.color='var(--glow)';
   S.stageReached.witness=true;setTimeout(buildWitnessPage,700);
@@ -766,7 +805,7 @@ function openAIPage(){
   document.getElementById('ai-text').value=preambleText();
   S.stageReached.ai=true;show('s-ai');
 }
-function openFirstSteps(){S.stageReached.help=true;show('s-help');}
+function openFirstSteps(from){S.helpFrom=from||'s-witness';S.stageReached.help=true;show('s-help');}
 function chooseHelp(mode){S.disposition=mode;S.stageReached.steps=true;buildSteps();}
 
 // ————— OUTPUTS —————
@@ -934,10 +973,10 @@ function buildSteps(){
   show('s-steps');
 }
 // ————— DEPLOY CONFIG (fill these in; everything degrades honestly when empty) —————
-const UPDATES_ENDPOINT='';    // newsletter endpoint
-const FEEDBACK_EMAIL='';      // e.g. 'hello@loema.com'
-const DONATION_URL='';        // e.g. 'https://ko-fi.com/loema'
-const SITE_URL='';            // e.g. 'https://try.loema.com' — used when sharing from a downloaded copy
+const UPDATES_ENDPOINT='https://buttondown.com/api/emails/embed-subscribe/loema';
+const FEEDBACK_EMAIL='feedback@loema.com';
+const DONATION_URL='https://ko-fi.com/loema';
+const SITE_URL='https://loema.com';
 function joinUpdates(){
   const input=document.getElementById('updateemail'),e=input.value.trim(),status=document.getElementById('updateok');
   if(!input.checkValidity()||!e){status.textContent='Enter a valid email whenever you’re ready.';input.focus();return;}
@@ -949,6 +988,41 @@ function joinUpdates(){
   } else {
     status.textContent='Prototype only — nothing was submitted. The newsletter connection will be added at deployment.';
   }}
+// ————— HELP US UNDERSTAND — clarity analytics (all optional; only answered lines travel) —————
+const CA={};
+document.querySelectorAll('[data-ca]').forEach(row=>{
+  row.addEventListener('click',e=>{
+    const b=e.target.closest('button');if(!b)return;
+    const key=row.dataset.ca;
+    if(CA[key]===b.textContent){delete CA[key];b.setAttribute('aria-pressed','false');return;}
+    CA[key]=b.textContent;
+    row.querySelectorAll('button').forEach(x=>x.setAttribute('aria-pressed',x===b?'true':'false'));
+  });
+});
+function openClarity(){show('s-clarity');}
+const CA_LABEL={before:'Clarity before Loema',after:'Clarity now',thread:'Did the thread fit',return:'Will they return to it',
+  hesitate:'Where they hesitated',voice:'What didn’t sound like a person',assumption:'What we assumed wrong'};
+function clarityBody(){
+  const lines=[];
+  Object.keys(CA).forEach(k=>lines.push(CA_LABEL[k]+': '+CA[k]));
+  document.querySelectorAll('[data-caf]').forEach(t=>{const v=t.value.trim();if(v)lines.push(CA_LABEL[t.dataset.caf]+': '+v);});
+  return lines.join('\n');
+}
+function claritySend(){
+  const body=clarityBody();
+  if(!body){document.getElementById('claritynote').textContent='Nothing answered — that’s a complete answer too. Thank you for looking.';return;}
+  if(FEEDBACK_EMAIL){
+    location.href='mailto:'+FEEDBACK_EMAIL+'?subject='+encodeURIComponent('Loema — help us understand')+'&body='+encodeURIComponent(body+'\n\n(Only what I chose to answer. Sent by me, kept by no one else.)');
+    document.getElementById('claritynote').textContent='Your mail app has it — send when ready. Understanding traveled both ways today.';
+  } else {
+    document.getElementById('claritynote').textContent='The line opens with the public round — thank you for answering.';
+  }}
+function clarityCopy(){
+  const body=clarityBody();
+  if(!body){document.getElementById('claritynote').textContent='Nothing answered yet — skip freely, or copy after answering.';return;}
+  const done=()=>{document.getElementById('claritynote').textContent='Copied — paste it to feedback@loema.com whenever suits you.';};
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(body).then(done).catch(done);}else done();}
+
 // ————— CONTRIBUTE TO CLARITY —————
 function clarNote(t){document.getElementById('clarnote').textContent=t;}
 function shareURL(){return location.protocol.indexOf('http')===0?location.href.split('#')[0]:(SITE_URL||'');}
@@ -1002,7 +1076,7 @@ function coverCanvas(){
   const lh=(size+4)*1.5;
   const groupTop=Math.max(540,800-(70+(lines.length-1)*lh)/2);
   x.fillStyle='#566052';x.font='600 22px Helvetica, Arial, sans-serif';
-  x.fillText('HOW I WANT TECHNOLOGY TO FEEL',W/2,groupTop);
+  x.fillText('HOW I WANT TECHNOLOGY TO FEEL LIKE',W/2,groupTop);
   let y=groupTop+70;
   x.fillStyle='#1a201b';x.font='italic '+(size+4)+'px Georgia, serif';
   lines.forEach(l=>{x.fillText(l,W/2,y);y+=lh;});
@@ -1024,30 +1098,32 @@ function dlCard(){
   const a=document.createElement('a');a.href=c.toDataURL('image/png');a.download='my-personal-constitution-cover.png';a.click();
 }
 function documentCanvases(){
-  const pages=[];
+  const pageObjs=[];
+  function put(pg,text,x,y,px){pg.x.fillText(text,x,y);pg.texts.push({t:String(text),x:x,y:y,px:px});}
   function newPage(title){
     const c=makeCanvas(),x=c.getContext('2d');paintPaper(x);
+    const pg={c,x,y:260,texts:[]};
     x.textAlign='left';x.fillStyle='#3f5c46';x.font='italic 24px Georgia, serif';
-    x.fillText(S.authorName?S.authorName+' — with Loema':'Loema',82,105);
-    x.fillStyle='#1a201b';x.font='40px Georgia, serif';x.fillText(title,82,178);
+    put(pg,S.authorName?S.authorName+' — with Loema':'Loema',82,105,24);
+    x.fillStyle='#1a201b';x.font='40px Georgia, serif';put(pg,title,82,178,40);
     x.strokeStyle='#cfd8cc';x.lineWidth=2;x.beginPath();x.moveTo(82,205);x.lineTo(998,205);x.stroke();
-    return {c,x,y:260};
+    return pg;
   }
   let page=newPage('My Personal Constitution');
-  function addSection(label,text,italic=false){
+  function addSection(label,text,italic){
     const maxW=900;
     let x=page.x;
     x.font=(italic?'italic ':'')+'29px Georgia, serif';
     const lines=cardWrap(x,String(text),maxW);
     const needed=32+lines.length*43+38;
     if(page.y+needed>1210){
-      pages.push(page.c);page=newPage('My Personal Constitution · continued');
+      pageObjs.push(page);page=newPage('My Personal Constitution · continued');
       x=page.x;
     }
     x.fillStyle='#3f5c46';x.font='600 20px Helvetica, Arial, sans-serif';
-    x.fillText(label.toUpperCase(),82,page.y);page.y+=38;
+    put(page,label.toUpperCase(),82,page.y,20);page.y+=38;
     x.fillStyle='#1a201b';x.font=(italic?'italic ':'')+'29px Georgia, serif';
-    lines.forEach(line=>{x.fillText(line,82,page.y);page.y+=43;});
+    lines.forEach(line=>{put(page,line,82,page.y,29);page.y+=43;});
     page.y+=30;
   }
   addSection('Preamble — my words',`“${S.preamble}”`,true);
@@ -1056,14 +1132,14 @@ function documentCanvases(){
   addSection('The thread',S.thread);
   addSection('Held open by Loema — not my words','Storage stays local-first until you decide otherwise.');
   addSection(sealWord()==='ratified'?'Ratification':'Witness',`${sealWord()[0].toUpperCase()+sealWord().slice(1)} by ${S.authorName||'the author'} on ${new Date(S.witnessedAt).toLocaleString()}. Loema kept nothing.`);
-  pages.push(page.c);
-  pages.forEach((c,i)=>{
-    const x=c.getContext('2d');x.textAlign='right';x.fillStyle='#566052';
-    x.font='20px Helvetica, Arial, sans-serif';x.fillText(`${i+1} / ${pages.length}`,990,1285);
+  pageObjs.push(page);
+  pageObjs.forEach((pg,i)=>{
+    const x=pg.x;x.textAlign='right';x.fillStyle='#566052';
+    x.font='20px Helvetica, Arial, sans-serif';put(pg,`${i+1} / ${pageObjs.length}`,990,1285,20);
     x.textAlign='left';x.font='italic 22px Georgia, serif';x.fillStyle='#3f5c46';
-    x.fillText('co-author your digital experience',82,1285);
+    put(pg,'co-author your digital experience',82,1285,22);
   });
-  return [coverCanvas(),...pages];
+  return [{canvas:coverCanvas(),texts:[]},...pageObjs.map(pg=>({canvas:pg.c,texts:pg.texts}))];
 }
 function bytesFromString(value){return new TextEncoder().encode(value);}
 function joinBytes(parts){
@@ -1077,15 +1153,32 @@ function jpegBytes(canvas){
 function streamObject(dictionary,body){
   return joinBytes([bytesFromString(`<< ${dictionary} /Length ${body.length} >>\nstream\n`),body,bytesFromString('\nendstream')]);
 }
-function imagePDF(canvases){
-  const objects=[null,null,null],kids=[];
-  canvases.forEach(canvas=>{
-    const image=jpegBytes(canvas),imageNo=objects.length;
+function pdfText(t){ // WinAnsi-safe: smart punctuation mapped, the rest of non-Latin dropped to '?'
+  return t.replace(/[\u2018\u2019]/g,"'").replace(/[\u201C\u201D]/g,'"').replace(/[\u2014\u2013]/g,'-')
+          .replace(/\u00a0/g,' ').replace(/\u29bf/g,'(o)').replace(/\u00b7/g,'.')
+          .replace(/[^\x20-\x7e]/g,'?')
+          .replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');
+}
+function imagePDF(pageDatas){
+  const objects=[null,null,null,null],kids=[];
+  objects[3]=bytesFromString('<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica /Encoding /WinAnsiEncoding >>');
+  const sx=612/1080, sy=765/1350;
+  pageDatas.forEach(pd=>{
+    const canvas=pd.canvas,image=jpegBytes(canvas),imageNo=objects.length;
     objects.push(streamObject(`/Type /XObject /Subtype /Image /Width ${canvas.width} /Height ${canvas.height} /ColorSpace /DeviceRGB /BitsPerComponent 8 /Filter /DCTDecode`,image));
-    const command=bytesFromString('q\n612 0 0 765 0 0 cm\n/Im0 Do\nQ'),contentNo=objects.length;
+    let cmd='q\n612 0 0 765 0 0 cm\n/Im0 Do\nQ';
+    if(pd.texts.length){ // invisible text layer: searchable, selectable, screen-reader readable
+      cmd+='\nBT\n3 Tr\n';
+      pd.texts.forEach(t=>{
+        const X=(t.x*sx).toFixed(1), Y=(765-t.y*sy).toFixed(1), SZ=(t.px*sy).toFixed(1);
+        cmd+=`/F1 ${SZ} Tf\n1 0 0 1 ${X} ${Y} Tm\n(${pdfText(t.t)}) Tj\n`;
+      });
+      cmd+='ET';
+    }
+    const command=bytesFromString(cmd),contentNo=objects.length;
     objects.push(streamObject('',command));
     const pageNo=objects.length;
-    objects.push(bytesFromString(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 765] /Resources << /XObject << /Im0 ${imageNo} 0 R >> >> /Contents ${contentNo} 0 R >>`));
+    objects.push(bytesFromString(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 765] /Resources << /XObject << /Im0 ${imageNo} 0 R >> /Font << /F1 3 0 R >> >> /Contents ${contentNo} 0 R >>`));
     kids.push(`${pageNo} 0 R`);
   });
   objects[1]=bytesFromString('<< /Type /Catalog /Pages 2 0 R >>');
@@ -1120,6 +1213,7 @@ function activeScreen(){return document.querySelector('.screen.active')?.id||'s-
 function resetWitnessForEdit(){
   signed=false;clearTimeout(holdTimer);holdTimer=null;S.witnessed=false;S.witnessedAt=null;
   taps=[];circles=[];tracing=false;S.ringMemory=null;
+  const rm=document.getElementById('ringmemory');if(rm)rm.checked=false;
   S.disposition=null;S.stageReached.witness=false;S.stageReached.ai=false;S.stageReached.help=false;S.stageReached.steps=false;
   sig.classList.remove('holding','witnessed');
   fill.style.transition='none';fill.style.strokeDashoffset='427';
@@ -1138,8 +1232,9 @@ function backOne(){
   if(current==='s-sign'){show('s-const');return;}
   if(current==='s-witness'){show('s-const');return;}
   if(current==='s-ai'){show('s-witness');return;}
-  if(current==='s-help'){show(S.stageReached.ai?'s-ai':'s-witness');return;}
+  if(current==='s-help'){show(S.helpFrom||'s-witness');return;}
   if(current==='s-steps'){show('s-help');return;}
+  if(current==='s-clarity'){show('s-steps');return;}
 }
 const HISTORY_LABELS={
   q1:'The tabs',q2:'How you make sense of things',
