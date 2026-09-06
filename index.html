@@ -146,7 +146,7 @@
   <div class="wordmark">Loema</div>
   <div class="opener">You've been meaning to figure this out for a while now.</div>
   <h1>The problem isn't information.<br>It's orientation.</h1>
-  <div class="proof">No account. No scores. No ads. Your words stay yours.</div>
+  <div class="proof">No account. No scores. No ads. No tracking.<br>Nothing you write here is sent to Loema or anyone else — your words live on this page and leave only in the file you choose to keep.</div>
   <div class="depth">Somewhere out there is a version of you, written by everything you've clicked, watched, and left behind. It gets told whether you show up or not — you've just never been offered the pen. A few honest questions, a few minutes, and you'll leave holding something that's entirely yours.</div>
   <div class="cta-line">Co-author your story.</div>
   <button type="button" onclick="start()">Join the conversation</button>
@@ -328,8 +328,9 @@
     <p id="stepsintro"></p>
     <ol class="steps" id="stepslist"></ol>
     <div class="hint" id="lexhint" style="display:none">Dotted terms are doors — tap any of them for a plain-language explanation.</div>
-    <div class="glossary" id="step-glossary" aria-label="Small glossary"></div>
   </div>
+  <div id="morewrap"></div>
+  <div class="glossary" id="step-glossary" aria-label="Small glossary"></div>
 
   <div class="contribute">
     <h2>Contribute to clarity</h2>
@@ -453,28 +454,75 @@ const FLOW = [
 
 const POSTS=['comfortable','concerned','uncertain','conditional'];
 function setPosture(dom,i,ev){S.postures[dom]=POSTS[i];S.evidence[dom]=ev;}
+// “Keep what mattered, release the rest” and “decide case by case” are different
+// philosophies — one curatorial, one deliberative. Same posture, different words.
+function retentionCurated(){return !!(S.answers.q9&&S.answers.q9.i===2);}
+function toldFor(d){
+  if(d==='retention'&&S.postures.retention==='conditional'&&retentionCurated())
+    return 'you’d keep what mattered and let the rest go';
+  return TOLD[d][S.postures[d]];
+}
+function baseRuleFor(d){
+  if(d==='retention'&&S.postures.retention==='conditional'&&retentionCurated())
+    return 'What mattered stays; the rest may fade. Keeping is my choice, not a platform’s default.';
+  return RULES[d][S.postures[d]];
+}
 
 // ————— CARDS + PERSONAL THREAD —————
 function protectedThing(){
   const fixed=['the project you care about','the people you keep meaning to reach','the rest you keep postponing','room to hear your own thoughts'];
   return S.P===4 && S.Ptext ? S.Ptext : fixed[S.P] || 'what matters to you';
 }
-function protectionSentence(){
+// A person's own words arrive in any shape — a phrase, a fragment, a whole confession.
+// Only phrase-shaped words may be woven into our sentences; anything else is quoted
+// whole or referred to gently. Never grammatically mangled.
+function phraseSafe(text){
+  const t=(text||'').trim();
+  return t.length>0&&t.length<=60&&!/[.!?;…]./.test(t)&&!/(^|\s)[Ii](\s|’|')/.test(t);
+}
+function embedText(){return (S.Ptext||'').trim().replace(/[.!?\s]+$/,'');}
+function protectedRef(){ // safe to embed mid-sentence — second person, on screen
+  if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)?embedText():'what you named';
+  return protectedThing();
+}
+function protectedRefFirstPerson(){ // safe to embed — first person, inside their document
+  const fixed=['the project I care about','the people I keep meaning to reach','the rest I keep postponing','room to hear my own thoughts'];
+  if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)?embedText():'what I named in my own words';
+  return fixed[S.P]||'what matters to me';
+}
+function protectionSentence(){ // second person — spoken to the person on screen
   const fixed=[
     'You are trying to protect time and attention for a project you care about.',
     'You are trying to protect the relationships you keep meaning to return to.',
     'You are trying to protect room for actual rest.',
     'You are trying to protect enough quiet to hear your own thoughts.'
   ];
-  return S.P===4 && S.Ptext ? `You are trying to protect room for “${S.Ptext}.”` : fixed[S.P];
+  if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)
+    ?`You are trying to protect room for ${embedText()}.`
+    :`You named it yourself: “${S.Ptext.trim()}”`;
+  return fixed[S.P];
+}
+function protectionSentenceFirstPerson(){ // first person — lives inside the person's own document
+  const fixed=[
+    'I am protecting time and attention for a project I care about.',
+    'I am protecting the relationships I keep meaning to return to.',
+    'I am protecting room for actual rest.',
+    'I am protecting enough quiet to hear my own thoughts.'
+  ];
+  if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)
+    ?`I am protecting room for ${embedText()}.`
+    :`I named it myself: “${S.Ptext.trim()}”`;
+  return fixed[S.P];
 }
 function connectionCard(){
-  const thing=protectedThing();
+  const lead=S.P===4&&S.Ptext&&!phraseSafe(S.Ptext)
+    ?`“${S.Ptext.trim()}” — your words`
+    :`You named ${protectedRef()}`;
   const mornings=[
-    `You named ${thing}. Yet your day often begins by checking what came in before you're fully awake.`,
-    `You named ${thing}, and you already begin with a small routine that feels like yours.`,
-    `You named ${thing}, while your day often begins by going straight into whatever needs you.`,
-    `You named ${thing}, and the way your day begins changes from one morning to the next.`
+    `${lead}. Yet your day often begins by checking what came in before you're fully awake.`,
+    `${lead}. And you already begin with a small routine that feels like yours.`,
+    `${lead}. Meanwhile your day often begins by going straight into whatever needs you.`,
+    `${lead}. And the way your day begins changes from one morning to the next.`
   ];
   const lens={
     plain:"That may be one place it keeps getting lost.",
@@ -501,7 +549,7 @@ function termsCard(){
 
 // ————— FLOW ENGINE —————
 let idx=-1;
-function start(){S.started=true;idx=0;S.maxIdx=0;show('s-quiz');renderCurrent();}
+function start(){S.started=true;idx=0;S.maxIdx=0;beacon('questions');show('s-quiz');renderCurrent();}
 function advance(){
   idx++;
   S.maxIdx=Math.max(S.maxIdx,idx);
@@ -588,7 +636,7 @@ function morningLine(){
   ][S.B];
 }
 function inferredThread(){
-  const d=tensionDomain(),place=DOMLABEL[d].toLowerCase(),thing=protectedThing();
+  const d=tensionDomain(),place=DOMLABEL[d].toLowerCase(),thing=protectedRef();
   const posture={
     comfortable:'That area mostly sits well with you, so the work is keeping it intentional.',
     concerned:'That is where the clearest tension showed up.',
@@ -598,7 +646,7 @@ function inferredThread(){
   const voices={
     plain:`You are trying to make room for ${thing}. ${place[0].toUpperCase()+place.slice(1)} is where technology currently has the most say. ${morningLine()} ${posture} You may not need less technology; you need it to stop deciding against what you already care about.`,
     boundaries:`You are protecting ${thing}. The clearest boundary belongs around ${place}. ${morningLine()} ${posture} The point is not withdrawal; it is making sure your tools stop crossing a line you have now named.`,
-    technical:`Your desired outcome is more room for ${thing}. The strongest friction signal appeared in ${place}. ${morningLine()} ${posture} The useful move is to change the defaults around that pressure point, then see whether real life gets more room.`,
+    technical:`Your desired outcome is more room for ${thing}. The strongest friction signal appeared in ${place}. ${morningLine()} ${posture} That pressure point is where the defaults currently outrank your say.`,
     creative:`You are trying to leave room for ${thing}. Right now, ${place} is where another author seems to hold the pen most often. ${morningLine()} ${posture} You may not need to leave technology behind; you may need it to stop writing over the life already asking for you.`
   };
   return voices[S.register];
@@ -619,12 +667,13 @@ function buildMirror(){
   const told=document.getElementById('m-told');told.textContent='';
   DOMS.forEach((d,i)=>{
     const b=document.createElement('b');b.textContent=DOMLABEL[d];told.appendChild(b);
-    told.appendChild(document.createTextNode(' — '+TOLD[d][S.postures[d]]+'.'));
+    told.appendChild(document.createTextNode(' — '+toldFor(d)+'.'));
     if(i<DOMS.length-1)told.appendChild(document.createElement('br'));
   });
   S.thread=inferredThread();S.threadSource='inferred';
   document.getElementById('m-thread').textContent=S.thread;
   S.stageReached.mirror=true;
+  beacon('mirror');
   show('s-mirror');
 }
 function verdict(v){
@@ -716,7 +765,7 @@ function buildConstitution(){
   document.getElementById('c-purpose').textContent=protectionSentence()+' These terms exist to keep technology from deciding against that without your say.';
   const wrap=document.getElementById('articles');wrap.innerHTML='';
   DOMS.forEach(d=>{
-    S.articles[d]={posture:S.postures[d],rule:voicedRule(d,RULES[d][S.postures[d]]),source:'generated_from_response',
+    S.articles[d]={posture:S.postures[d],rule:voicedRule(d,baseRuleFor(d)),source:'generated_from_response',
       evidence:S.evidence[d],confirmed:false,amended:false};
     const div=document.createElement('div');div.className='article';
     const dom=document.createElement('div');dom.className='dom';dom.textContent=DOMLABEL[d];div.appendChild(dom);
@@ -732,11 +781,12 @@ function buildConstitution(){
   document.getElementById('standby').checked=false;
   document.getElementById('standby-note').textContent='';
   S.stageReached.constitution=true;
+  beacon('constitution');
   show('s-const');
 }
 function syncArticleEdits(){
   document.querySelectorAll('#articles textarea').forEach(t=>{
-    const d=t.dataset.d,edited=t.value.trim();
+    const d=t.dataset.d,edited=t.value.replace(/\s+/g,' ').replace(/([.!?])(?=[A-Z“"])/g,'$1 ').trim();
     if(edited!==S.articles[d].rule){S.articles[d].rule=edited;S.articles[d].amended=true;S.articles[d].source='authored';}
     S.articles[d].confirmed=true;
   });
@@ -795,7 +845,7 @@ function ratify(){
   S.ringMemory=ringOn()?{hold_ms:3000,rhythm_ms:taps.slice(1).map((t,i)=>Math.round((t-taps[i])/50)*50),circles:circles.slice()}:null;
   sig.classList.remove('holding');sig.classList.add('witnessed');
   const sn=document.getElementById('signote');sn.textContent='⦿  '+sealWord()+'.';sn.style.color='var(--glow)';
-  S.stageReached.witness=true;setTimeout(buildWitnessPage,700);
+  S.stageReached.witness=true;beacon('witnessed');setTimeout(buildWitnessPage,700);
 }
 function buildWitnessPage(){
   const w=sealWord();
@@ -830,7 +880,7 @@ function dl(name,text,mime){const a=document.createElement('a');
   setTimeout(()=>URL.revokeObjectURL(url),1000);}
 function humanText(){
   const d=doc();let out=`MY PERSONAL CONSTITUTION\n${'═'.repeat(40)}\n${S.authorName?`Author: ${S.authorName}\n`:''}\nPREAMBLE — my words\n“${d.preamble.text}”\n\n`;
-  out+=`WHAT THESE TERMS PROTECT\n${protectionSentence()}\n\n`;
+  out+=`WHAT THESE TERMS PROTECT\n${protectionSentenceFirstPerson()}\n\n`;
   DOMS.forEach(dom=>{const a=S.articles[dom];
     out+=`${DOMLABEL[dom].toUpperCase()}\n${a.rule}\n(${a.amended?'authored by me':'drafted from my answers, confirmed by me'})\n\n`;});
   const w=sealWord();
@@ -838,7 +888,7 @@ function humanText(){
   return out;}
 function preambleText(){
   const d=doc();
-  return `# PERSONAL CONSTITUTION — AI PREAMBLE\n# This gives an AI context; it does not override system or provider rules.\n# The provider may receive and retain anything pasted here.\n\nThese are my preferences for this conversation. Follow them where they do not conflict with system, provider, safety, or legal requirements. If you cannot follow one, tell me plainly before continuing.\n\n${S.authorName?`Call me: ${S.authorName}\n\n`:''}My own words: “${d.preamble.text}”\n\nWhat I am protecting: ${protectedThing()}.\n\nMy terms:\n`+DOMS.map(dom=>`- ${DOMLABEL[dom]}: ${S.articles[dom].rule}`).join('\n')+
+  return `# PERSONAL CONSTITUTION — AI PREAMBLE\n# This gives an AI context; it does not override system or provider rules.\n# The provider may receive and retain anything pasted here.\n\nThese are my preferences for this conversation. Follow them where they do not conflict with system, provider, safety, or legal requirements. If you cannot follow one, tell me plainly before continuing.\n\n${S.authorName?`Call me: ${S.authorName}\n\n`:''}My own words: “${d.preamble.text}”\n\nWhat I am protecting: ${S.P===4&&S.Ptext?S.Ptext.trim():protectedRefFirstPerson()}.\n\nMy terms:\n`+DOMS.map(dom=>`- ${DOMLABEL[dom]}: ${S.articles[dom].rule}`).join('\n')+
   `\n\nDo not silently imply that these terms outrank rules you must follow. Name any conflict clearly and let me decide whether to continue.\n\n(Prepared by Loema. Stored only by its author. ${new Date().toDateString()})`;}
 function dlJSON(){dl('my-constitution.json',JSON.stringify(doc(),null,2),'application/json');}
 function dlHuman(){dl('my-constitution.txt',humanText(),'text/plain');}
@@ -924,9 +974,10 @@ function personalFirstStep(){
       'Tomorrow morning, don’t reach for it first. Be fully awake before anything arrives — the rest you named starts there.',
       'Tomorrow morning, before any input reaches you, write down the first thought that is actually yours.'
     ];
-    return S.P===4&&S.Ptext
-      ? `Tomorrow morning, before anything checks in on you, give “${S.Ptext}” the first ten minutes. Let the day open with what you named.`
-      : morning[S.P];
+    if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)
+      ? `Tomorrow morning, before anything checks in on you, give ${embedText()} the first ten minutes. Let the day open with what you named.`
+      : `Tomorrow morning, before anything checks in on you, give the first ten minutes to what you named. Let the day open with it.`;
+    return morning[S.P];
   }
   const fixed=[
     'Before changing a setting, give the project you named fifteen uninterrupted minutes. Let the rule serve the life first.',
@@ -934,9 +985,10 @@ function personalFirstStep(){
     'Before changing a setting, protect twenty minutes with no incoming content today. Let the rule make room for rest first.',
     'Before changing a setting, write down one thought before another input reaches you. Let the rule make room for your own voice first.'
   ];
-  return S.P===4&&S.Ptext
-    ? `Before changing a setting, give “${S.Ptext}” fifteen protected minutes. Let the rule serve the life first.`
-    : fixed[S.P];
+  if(S.P===4&&S.Ptext)return phraseSafe(S.Ptext)
+    ? `Before changing a setting, give ${embedText()} fifteen protected minutes. Let the rule serve the life first.`
+    : `Before changing a setting, give what you named fifteen protected minutes. Let the rule serve the life first.`;
+  return fixed[S.P];
 }
 function escapeHTML(value){
   return String(value).replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[ch]));
@@ -944,11 +996,12 @@ function escapeHTML(value){
 function buildSteps(){
   const d=tensionDomain(),mode=S.disposition||'hands_on';
   document.getElementById('stepshead').textContent='Your first step — protect what mattered';
+  const ref=protectedRef();
   const intros={
-    plain:`You named ${protectedThing()}. Start there, then change ${DOMLABEL[d].toLowerCase()}, where the strongest tension showed up.`,
-    boundaries:`Protect ${protectedThing()} first. Then place a clearer boundary around ${DOMLABEL[d].toLowerCase()}.`,
-    technical:`Test the outcome in real life first: more room for ${protectedThing()}. Then change one ${DOMLABEL[d].toLowerCase()} default.`,
-    creative:`Give ${protectedThing()} the pen first. Then change ${DOMLABEL[d].toLowerCase()}, where another author had the strongest hold.`
+    plain:`You named ${ref}. Start there, then change ${DOMLABEL[d].toLowerCase()}, where the strongest tension showed up.`,
+    boundaries:`Protect ${ref} first. Then place a clearer boundary around ${DOMLABEL[d].toLowerCase()}.`,
+    technical:`Test the outcome in real life first: more room for ${ref}. Then change one ${DOMLABEL[d].toLowerCase()} default.`,
+    creative:`Give ${ref} the pen first. Then change ${DOMLABEL[d].toLowerCase()}, where another author had the strongest hold.`
   };
   document.getElementById('stepsintro').textContent=intros[S.register]+' '+(mode==='hands_on'
    ? 'You said you’d rather set it up yourself — so these are worth doing slowly, once, by hand.'
@@ -957,10 +1010,21 @@ function buildSteps(){
   document.getElementById('stepslist').innerHTML=steps.map((s,i)=>`<li>${i===0?escapeHTML(s):lexify(s)}</li>`).join('');
   const sl=document.getElementById('stepslist');
   sl.onclick=lexClick;
-  document.getElementById('lexhint').style.display=sl.querySelector('.lx')?'block':'none';
+  // Another step, when you're ready — a door, never homework.
+  const rank={concerned:3,conditional:2,uncertain:1,comfortable:0};
+  const nextDoms=DOMS.filter(x=>x!==d).sort((a,b)=>rank[S.postures[b]]-rank[S.postures[a]]).slice(0,2);
+  const moreSteps=[STEPS[d][mode][2],...nextDoms.map(x=>`${DOMLABEL[x]} — ${STEPS[x][mode][0]}`)].filter(Boolean);
+  const more=document.getElementById('morewrap');more.innerHTML='';
+  if(moreSteps.length){
+    more.innerHTML=`<details class="morebox"><summary>Another step, when you’re ready</summary><ol class="steps" id="morelist" style="margin-top:16px">${moreSteps.map(s=>`<li>${lexify(s)}</li>`).join('')}</ol><div class="hint">No schedule. The document keeps; so do these.</div></details>`;
+    document.getElementById('morelist').onclick=lexClick;
+  }
+  const lexScope=[...sl.querySelectorAll('.lx'),...more.querySelectorAll('.lx')];
+  document.getElementById('lexhint').style.display=lexScope.length?'block':'none';
   const glossary=document.getElementById('step-glossary');
   glossary.textContent='';
-  const keys=[...new Set([...sl.querySelectorAll('.lx')].map(el=>el.dataset.lex))];
+  beacon('steps');
+  const keys=[...new Set(lexScope.map(el=>el.dataset.lex))];
   if(keys.length){
     const title=document.createElement('h2');title.textContent='Small glossary';glossary.appendChild(title);
     keys.forEach(key=>{
@@ -973,6 +1037,16 @@ function buildSteps(){
   show('s-steps');
 }
 // ————— DEPLOY CONFIG (fill these in; everything degrades honestly when empty) —————
+// Funnel beacon — counts which pages get reached. Nothing else: no cookies, no IDs,
+// no answers, no words. The only data sent is a step name, once per visit per step.
+// Dormant while empty; set to '/api/beacon' once the Worker in infra/ is routed.
+const BEACON_ENDPOINT='';
+const beaconSent={};
+function beacon(step){
+  if(!BEACON_ENDPOINT||beaconSent[step])return;
+  beaconSent[step]=true;
+  try{navigator.sendBeacon(BEACON_ENDPOINT+'?s='+encodeURIComponent(step));}catch(e){}
+}
 const UPDATES_ENDPOINT='https://buttondown.com/api/emails/embed-subscribe/loema';
 const FEEDBACK_EMAIL='feedback@loema.com';
 const DONATION_URL='https://ko-fi.com/loema';
@@ -983,7 +1057,7 @@ function joinUpdates(){
   if(UPDATES_ENDPOINT){
     const fd=new FormData();fd.append('email',e);
     fetch(UPDATES_ENDPOINT,{method:'POST',body:fd,mode:'no-cors'})
-      .then(()=>{status.textContent='You’re in the conversation — talk soon.';})
+      .then(()=>{status.textContent='You’re in the conversation — talk soon.';beacon('waitlist');})
       .catch(()=>{status.textContent='That didn’t go through — try again in a moment.';});
   } else {
     status.textContent='Prototype only — nothing was submitted. The newsletter connection will be added at deployment.';
@@ -1076,7 +1150,7 @@ function coverCanvas(){
   const lh=(size+4)*1.5;
   const groupTop=Math.max(540,800-(70+(lines.length-1)*lh)/2);
   x.fillStyle='#566052';x.font='600 22px Helvetica, Arial, sans-serif';
-  x.fillText('HOW I WANT TECHNOLOGY TO FEEL LIKE',W/2,groupTop);
+  x.fillText('HOW I WANT TECHNOLOGY TO FEEL',W/2,groupTop);
   let y=groupTop+70;
   x.fillStyle='#1a201b';x.font='italic '+(size+4)+'px Georgia, serif';
   lines.forEach(l=>{x.fillText(l,W/2,y);y+=lh;});
@@ -1127,7 +1201,7 @@ function documentCanvases(){
     page.y+=30;
   }
   addSection('Preamble — my words',`“${S.preamble}”`,true);
-  addSection('What these terms protect',protectionSentence());
+  addSection('What these terms protect',protectionSentenceFirstPerson());
   DOMS.forEach(dom=>addSection(DOMLABEL[dom],S.articles[dom].rule));
   addSection('The thread',S.thread);
   addSection('Held open by Loema — not my words','Storage stays local-first until you decide otherwise.');
@@ -1303,6 +1377,7 @@ document.querySelectorAll('.screen').forEach(screen=>{
 window.addEventListener('beforeunload',e=>{
   if(S.started&&!S.stageReached.steps){e.preventDefault();e.returnValue='';}
 });
+beacon('landing');
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.setAttribute('aria-hidden','true');});
   const target=document.getElementById(id);target.classList.add('active');target.setAttribute('aria-hidden','false');
