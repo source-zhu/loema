@@ -550,7 +550,7 @@ function termsCard(){
 
 // ————— FLOW ENGINE —————
 let idx=-1;
-function start(){S.started=true;idx=0;S.maxIdx=0;beacon('questions');show('s-quiz');renderCurrent();}
+function start(){S.started=true;idx=0;S.maxIdx=0;show('s-quiz');renderCurrent();}
 function advance(){
   idx++;
   S.maxIdx=Math.max(S.maxIdx,idx);
@@ -674,7 +674,6 @@ function buildMirror(){
   S.thread=inferredThread();S.threadSource='inferred';
   document.getElementById('m-thread').textContent=S.thread;
   S.stageReached.mirror=true;
-  beacon('mirror');
   show('s-mirror');
 }
 function verdict(v){
@@ -782,7 +781,6 @@ function buildConstitution(){
   document.getElementById('standby').checked=false;
   document.getElementById('standby-note').textContent='';
   S.stageReached.constitution=true;
-  beacon('constitution');
   show('s-const');
 }
 function syncArticleEdits(){
@@ -846,7 +844,7 @@ function ratify(){
   S.ringMemory=ringOn()?{hold_ms:3000,rhythm_ms:taps.slice(1).map((t,i)=>Math.round((t-taps[i])/50)*50),circles:circles.slice()}:null;
   sig.classList.remove('holding');sig.classList.add('witnessed');
   const sn=document.getElementById('signote');sn.textContent='⦿  '+sealWord()+'.';sn.style.color='var(--glow)';
-  S.stageReached.witness=true;beacon('witnessed');setTimeout(buildWitnessPage,700);
+  S.stageReached.witness=true;setTimeout(buildWitnessPage,700);
 }
 function buildWitnessPage(){
   const w=sealWord();
@@ -1024,7 +1022,6 @@ function buildSteps(){
   document.getElementById('lexhint').style.display=lexScope.length?'block':'none';
   const glossary=document.getElementById('step-glossary');
   glossary.textContent='';
-  beacon('steps');
   const keys=[...new Set(lexScope.map(el=>el.dataset.lex))];
   if(keys.length){
     const title=document.createElement('h2');title.textContent='Small glossary';glossary.appendChild(title);
@@ -1038,16 +1035,6 @@ function buildSteps(){
   show('s-steps');
 }
 // ————— DEPLOY CONFIG (fill these in; everything degrades honestly when empty) —————
-// Funnel beacon — counts which pages get reached. Nothing else: no cookies, no IDs,
-// no answers, no words. The only data sent is a step name, once per visit per step.
-// Dormant while empty; set to '/api/beacon' once the Worker in infra/ is routed.
-const BEACON_ENDPOINT='';
-const beaconSent={};
-function beacon(step){
-  if(!BEACON_ENDPOINT||beaconSent[step])return;
-  beaconSent[step]=true;
-  try{navigator.sendBeacon(BEACON_ENDPOINT+'?s='+encodeURIComponent(step));}catch(e){}
-}
 const UPDATES_ENDPOINT='https://buttondown.com/api/emails/embed-subscribe/loema';
 const FEEDBACK_EMAIL='feedback@loema.com';
 const DONATION_URL='https://ko-fi.com/loema';
@@ -1058,7 +1045,7 @@ function joinUpdates(){
   if(UPDATES_ENDPOINT){
     const fd=new FormData();fd.append('email',e);
     fetch(UPDATES_ENDPOINT,{method:'POST',body:fd,mode:'no-cors'})
-      .then(()=>{status.textContent='You’re in the conversation — talk soon.';beacon('waitlist');})
+      .then(()=>{status.textContent='You’re in the conversation — talk soon.';})
       .catch(()=>{status.textContent='That didn’t go through — try again in a moment.';});
   } else {
     status.textContent='Prototype only — nothing was submitted. The newsletter connection will be added at deployment.';
@@ -1378,7 +1365,6 @@ document.querySelectorAll('.screen').forEach(screen=>{
 window.addEventListener('beforeunload',e=>{
   if(S.started&&!S.stageReached.steps){e.preventDefault();e.returnValue='';}
 });
-beacon('landing');
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.setAttribute('aria-hidden','true');});
   const target=document.getElementById(id);target.classList.add('active');target.setAttribute('aria-hidden','false');
