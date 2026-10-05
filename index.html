@@ -66,7 +66,7 @@
   #sigil circle.ring{fill:none;stroke:var(--ink);stroke-width:7;}
   #sigil circle.fillring{fill:none;stroke:var(--glow);stroke-width:7;stroke-dasharray:427;stroke-dashoffset:427;transform:rotate(-90deg);transform-origin:center;}
   #sigil circle.core{fill:var(--ink);transition:fill .35s ease,filter .35s ease;}
-  #sigil.holding circle.core,#sigil.witnessed circle.core{fill:var(--glow);filter:drop-shadow(0 0 13px rgba(217,160,50,.9));}
+  #sigil.holding circle.core,#sigil.witnessed circle.core{fill:var(--ink);filter:drop-shadow(0 0 13px rgba(217,160,50,.9));}
   #sigil.witnessed circle.ring{stroke:var(--glow);filter:drop-shadow(0 0 8px rgba(217,160,50,.48));}
   .signote{font-size:14px;color:var(--dim);font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;margin-top:16px;}
   .dl{display:flex;flex-direction:column;gap:12px;margin:30px 0;}
@@ -284,6 +284,7 @@
     <div class="dl" style="margin-top:6px">
       <button type="button" onclick="dlPersonalConstitution()">Readable document</button>
       <button class="ghost" type="button" onclick="dlJSON()">App-ready .json — for the app to come</button>
+      <button class="ghost" type="button" onclick="dlHuman()">Plain text — reads aloud cleanly</button>
       <button class="ghost" type="button" onclick="openAIPage()">AI Preamble — give an AI your terms</button>
       <button class="ghost" type="button" onclick="toggleCopyPanel()" style="font-size:14px;color:var(--dim)">Trouble downloading? View &amp; copy instead</button>
     </div>
@@ -450,7 +451,7 @@ const FLOW = [
   opts:['Anyone — I think out loud','A few chosen people','Mostly just me','Different circles for different things'],
   on:(i)=>{setPosture('sharing',[0,3,1,3][i],['q10']);}},
  {id:'free',kicker:'In your words',
-  text:'One sentence: what do you want your relationship with technology to feel like?',freeOnly:true}
+  text:'One sentence: how do you want your relationship with technology to feel?',freeOnly:true}
 ];
 
 const POSTS=['comfortable','concerned','uncertain','conditional'];
@@ -805,6 +806,8 @@ let holdTimer=null,signed=false,taps=[],circles=[];
 let tracing=false,lastAng=null,sweep=0,traceStart=0;
 const sig=document.getElementById('sigil'),fill=document.getElementById('fillring');
 function ringOn(){const c=document.getElementById('ringmemory');return !!(c&&c.checked);}
+// Hardening (Decision 0014 verify pass): with the box unchecked, taps and sweeps
+// are not collected at all — not captured-then-discarded, simply never captured.
 function angOf(e){const r=sig.getBoundingClientRect();
   const x=e.clientX-(r.left+r.width/2),y=e.clientY-(r.top+r.height/2);
   return Math.atan2(y,x)*180/Math.PI;}
@@ -1074,8 +1077,10 @@ function claritySend(){
   const body=clarityBody();
   if(!body){document.getElementById('claritynote').textContent='Nothing answered — that’s a complete answer too. Thank you for looking.';return;}
   if(FEEDBACK_EMAIL){
-    location.href='mailto:'+FEEDBACK_EMAIL+'?subject='+encodeURIComponent('Loema — help us understand')+'&body='+encodeURIComponent(body+'\n\n(Only what I chose to answer. Sent by me, kept by no one else.)');
-    document.getElementById('claritynote').textContent='Your mail app has it — send when ready. Understanding traveled both ways today.';
+    const note=document.getElementById('claritynote');
+    const done=()=>{note.textContent='Your mail app has it — and your answers are copied, in case it didn\u2019t open. Send to '+FEEDBACK_EMAIL+' when ready.';};
+    if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(body).then(done).catch(done);}else done();
+    try{location.href='mailto:'+FEEDBACK_EMAIL+'?subject='+encodeURIComponent('Loema — help us understand')+'&body='+encodeURIComponent(body+'\n\n(Only what I chose to answer. Sent by me, kept by no one else.)');}catch(e){}
   } else {
     document.getElementById('claritynote').textContent='The line opens with the public round — thank you for answering.';
   }}
@@ -1088,11 +1093,16 @@ function clarityCopy(){
 // ————— CONTRIBUTE TO CLARITY —————
 function clarNote(t){document.getElementById('clarnote').textContent=t;}
 function shareURL(){return location.protocol.indexOf('http')===0?location.href.split('#')[0]:(SITE_URL||'');}
+function mailOrCopy(subject,body,noteOk){
+  const addr=FEEDBACK_EMAIL;
+  const done=()=>clarNote(noteOk+' — '+addr);
+  if(navigator.clipboard&&navigator.clipboard.writeText){navigator.clipboard.writeText(addr).then(done).catch(done);}else done();
+  try{location.href='mailto:'+addr+'?subject='+encodeURIComponent(subject)+(body?'&body='+encodeURIComponent(body):'');}catch(e){}}
 function clarFeedback(){
-  if(FEEDBACK_EMAIL)location.href='mailto:'+FEEDBACK_EMAIL+'?subject='+encodeURIComponent('Loema — feedback');
+  if(FEEDBACK_EMAIL)mailOrCopy('Loema — feedback','', 'If no mail app opened, the address is copied');
   else clarNote('The feedback line opens with the public round — for now, telling a person counts double.');}
 function clarConfusing(){
-  if(FEEDBACK_EMAIL)location.href='mailto:'+FEEDBACK_EMAIL+'?subject='+encodeURIComponent('Loema — something was confusing')+'&body='+encodeURIComponent('The moment that lost me was: ');
+  if(FEEDBACK_EMAIL)mailOrCopy('Loema — something was confusing','The moment that lost me was: ','If no mail app opened, the address is copied');
   else clarNote('The report line opens with the public round — thank you for wanting to make it clearer.');}
 function clarShare(){
   const url=shareURL();
@@ -1138,7 +1148,7 @@ function coverCanvas(){
   const lh=(size+4)*1.5;
   const groupTop=Math.max(540,800-(70+(lines.length-1)*lh)/2);
   x.fillStyle='#566052';x.font='600 22px Helvetica, Arial, sans-serif';
-  x.fillText('HOW I WANT TECHNOLOGY TO FEEL',W/2,groupTop);
+  x.fillText('HOW I WANT MY RELATIONSHIP WITH TECHNOLOGY TO FEEL',W/2,groupTop);
   let y=groupTop+70;
   x.fillStyle='#1a201b';x.font='italic '+(size+4)+'px Georgia, serif';
   lines.forEach(l=>{x.fillText(l,W/2,y);y+=lh;});
@@ -1365,15 +1375,25 @@ document.querySelectorAll('.screen').forEach(screen=>{
 window.addEventListener('beforeunload',e=>{
   if(S.started&&!S.stageReached.steps){e.preventDefault();e.returnValue='';}
 });
+let navFromPop=false;
 function show(id){
   document.querySelectorAll('.screen').forEach(s=>{s.classList.remove('active');s.setAttribute('aria-hidden','true');});
   const target=document.getElementById(id);target.classList.add('active');target.setAttribute('aria-hidden','false');
+  if(!navFromPop){try{history.pushState({screen:id},'','');}catch(e){}}
   window.scrollTo(0,0);if(SCREEN_PHASE[id])setPhase(SCREEN_PHASE[id]);
   if(id!=='s-quiz')setTimeout(()=>{
     const focusTarget=target.querySelector('h1,[tabindex="-1"]');
     if(focusTarget){focusTarget.setAttribute('tabindex','-1');focusTarget.focus();}
   },0);
 }
+
+// Browser-back walks the pages; everything stays in this page's memory, so
+// nothing restarts and nothing is stored. (Defect fix, founder walk 2026-10-01.)
+window.addEventListener('popstate',function(e){
+  const s=e.state&&e.state.screen;
+  if(s&&document.getElementById(s)){navFromPop=true;show(s);navFromPop=false;}
+});
+try{history.replaceState({screen:'s-landing'},'','');}catch(e){}
 </script>
 </body>
 </html>
