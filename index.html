@@ -20,13 +20,40 @@
   *{margin:0;padding:0;box-sizing:border-box;}
   html{scroll-behavior:smooth;}
   body{font-family:Georgia,'Times New Roman',serif;background:var(--paper);color:var(--ink);line-height:1.6;transition:background-color 2.8s ease;}
-  h1,p,button,.opt,.card,.depth,.cta-line,.wordmark,.qnum,.q,.told,.mv h3,.article,.opener,.signote,.hint,.terms,.goodbye,.safeguard{transition:background-color 2.8s ease,color 2.8s ease,border-color 2.8s ease;}
+  h1,p,button,.opt,.card,.depth,.cta-line,.wordmark,.qnum,.q,.told,.mv h3,.article,.opener,.signote,.hint,.terms,.goodbye{transition:background-color 2.8s ease,color 2.8s ease,border-color 2.8s ease;}
   .sans{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;}
   .screen{display:none;min-height:100vh;padding:5vh 24px 12vh;max-width:640px;margin:0 auto;}
   .screen.active{display:block;animation:breathe .9s ease;}
   @keyframes breathe{from{opacity:0;transform:translateY(6px);}to{opacity:1;transform:none;}}
   .wordmark{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-weight:600;letter-spacing:.34em;font-size:14px;color:var(--accent);text-transform:uppercase;margin-bottom:9vh;}
   .opener{font-size:19px;color:var(--dim);font-style:italic;margin-bottom:26px;}
+  /* the domain toggle — loema.org's own component: loema stays; the half you're in drops down and swaps. Zero JS. */
+  .domain{position:relative;}
+  .domain summary{list-style:none;cursor:pointer;display:inline-flex;align-items:baseline;gap:0;}
+  .domain summary::-webkit-details-marker{display:none;}
+  .domain summary .org{color:var(--dim);}
+  .domain summary .caret{color:var(--dim);font-size:9px;letter-spacing:0;margin-left:2px;transform:translateY(-2px);}
+  .domain[open] summary .caret{transform:translateY(-2px) rotate(180deg);}
+  .domain .menu{position:absolute;top:calc(100% + 8px);left:0;z-index:20;min-width:230px;text-align:left;letter-spacing:0;text-transform:none;font-weight:400;
+    background:var(--soft);border:1px solid var(--line);border-radius:10px;padding:8px;box-shadow:0 6px 24px rgba(33,31,26,.08);}
+  .domain .menu a{display:block;padding:9px 12px;border-radius:6px;text-decoration:none;color:var(--ink);}
+  .domain .menu .dn-com{font:600 13px "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.34em;text-transform:uppercase;color:var(--accent);}
+  .domain .menu .dn-org{font:17px Georgia,serif;letter-spacing:.02em;color:var(--ink);}
+  .domain .menu .org{color:var(--dim);}
+  .domain .menu a:hover{background:var(--paper);}
+  .domain .menu .which{display:block;font:11px/1.4 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.1em;text-transform:uppercase;color:var(--dim);margin-top:2px;white-space:nowrap;}
+  .domain .menu a[aria-current] .which{color:var(--accent);}
+  /* the eight conversations — a quiet list, zero JS, no dates */
+  .rounds{margin-top:30px;color:var(--dim);}
+  .rounds summary{cursor:pointer;font:13px/1.5 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--dim);list-style:none;}
+  .rounds summary::-webkit-details-marker{display:none;}
+  .rounds summary::after{content:" ▾";font-size:9px;}
+  .rounds[open] summary::after{content:" ▴";}
+  .roundlist{list-style:none;padding:0;margin:14px 0 10px;}
+  .roundlist li{display:flex;justify-content:space-between;gap:16px;padding:7px 0;border-bottom:1px solid var(--line);font-size:16px;}
+  .roundlist .rn{color:var(--ink);}
+  .roundlist .rs{font:12px/1.6 "Helvetica Neue",Helvetica,Arial,sans-serif;letter-spacing:.06em;color:var(--dim);text-align:right;}
+  .roundlist li:first-child .rs{color:var(--accent);}
   h1{font-size:clamp(30px,5.6vw,42px);font-weight:400;line-height:1.25;margin-bottom:30px;}
   .proof{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:14px;color:var(--dim);letter-spacing:.04em;margin-bottom:8vh;}
   .proof-sub{display:inline-block;margin-top:6px;font-size:12.5px;opacity:.78;letter-spacing:.03em;}
@@ -57,7 +84,6 @@
   .article .dom{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--accent);margin-bottom:8px;}
   .article textarea{border:none;background:none;padding:0;font-size:17px;min-height:96px;}
   .article .tag{font-family:"Helvetica Neue",Helvetica,Arial,sans-serif;font-size:11px;color:var(--dim);margin-top:6px;}
-  .safeguard{border:1px dashed var(--line);border-radius:6px;padding:16px 20px;margin:22px 0;color:var(--dim);font-size:15px;}
   .sigwrap{text-align:center;padding:30px 0 10px;}
   #sigil{width:170px;height:170px;padding:10px;background:none;border-radius:50%;cursor:pointer;-webkit-tap-highlight-color:transparent;user-select:none;touch-action:none;}
   @media(hover:hover){#sigil:hover{background:var(--soft);}}
@@ -143,13 +169,35 @@
 
 <!-- ═══════════ LANDING ═══════════ -->
 <section class="screen active" id="s-landing">
-  <div class="wordmark">Loema</div>
+  <details class="domain wordmark">
+    <summary aria-label="loema.com — switch between loema.com and loema.org">Loema<span class="org">.com</span> <span class="caret" aria-hidden="true">&#9662;</span></summary>
+    <div class="menu">
+      <a href="https://loema.com" aria-current="true"><span class="dn-com">loema<span class="org">.com</span></span>
+        <span class="which">where you begin — the conversations</span></a>
+      <a href="https://loema.org"><span class="dn-org">loema<span class="org">.org</span></span>
+        <span class="which">where it continues — the commons</span></a>
+    </div>
+  </details>
   <div class="opener">You've been meaning to figure this out for a while now.</div>
   <h1>The problem isn't information.<br>It's orientation.</h1>
   <div class="proof">No account. No scores. No ads. No tracking.<br><span class="proof-sub">Nothing you write is collected. Your words leave only in the file you keep.</span></div>
   <div class="depth">Somewhere out there is a version of you, written by everything you've clicked, watched, and left behind. It gets told whether you show up or not — you've just never been offered the pen. A few honest questions, a few minutes, and you'll leave holding something that's entirely yours.</div>
   <div class="cta-line">Co-author your story.</div>
   <button type="button" onclick="start()">Join the conversation</button>
+  <details class="rounds">
+    <summary>Eight conversations, one at a time</summary>
+    <ol class="roundlist">
+      <li><span class="rn">The first conversation</span><span class="rs">open — it begins above</span></li>
+      <li><span class="rn">Feeds</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Data</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Attention</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Retention</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Sharing</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Participation</span><span class="rs">not yet</span></li>
+      <li><span class="rn">Self</span><span class="rs">not yet — builds on your first</span></li>
+    </ol>
+    <p class="terms">They arrive one at a time, with no dates and no rush. When one opens, bring the file you keep.</p>
+  </details>
 </section>
 
 <!-- ═══════════ QUIZ ═══════════ -->
@@ -226,7 +274,6 @@
   <div class="mv"><h3>Preamble — your words</h3><div class="yousaid" id="c-preamble" style="font-size:20px"></div></div>
   <div class="purpose"><h3>What these terms protect</h3><p id="c-purpose"></p></div>
   <div id="articles"></div>
-  <div class="safeguard" id="safeguard"></div>
   <label class="standby"><input type="checkbox" id="standby"><span>These words are mine — I've changed anything that wasn't.</span></label>
   <div class="navrow"><button type="button" onclick="readyToSign()">Ready to sign</button></div>
   <div class="hint status" id="standby-note" role="status"></div>
@@ -281,8 +328,9 @@
   </div>
   <div id="keeppanel" style="display:none">
     <div class="dl" style="margin-top:6px">
-      <button type="button" onclick="dlPersonalConstitution()">Readable document</button>
-      <button class="ghost" type="button" onclick="dlJSON()">App-ready .json — for the app to come</button>
+      <button type="button" onclick="dlJSON()">Download your constitution</button>
+      <div class="hint" style="margin:-4px 0 10px">This file is your constitution. It's yours to hold and to protect. Loema keeps no copy, so no one can send you another.</div>
+      <button class="ghost" type="button" onclick="dlPersonalConstitution()">A copy to read (PDF)</button>
       <button class="ghost" type="button" onclick="dlHuman()">Plain text — reads aloud cleanly</button>
       <button class="ghost" type="button" onclick="openAIPage()">AI Preamble — give an AI your terms</button>
       <button class="ghost" type="button" onclick="toggleCopyPanel()" style="font-size:14px;color:var(--dim)">Trouble downloading? View &amp; copy instead</button>
@@ -290,8 +338,8 @@
     <div class="download-status" id="download-status" role="status"></div>
     <div id="copypanel" style="display:none;margin-top:18px">
       <div class="navrow wrap" style="gap:8px;margin:0 0 10px">
-        <button class="ghost" type="button" onclick="copyShow('human')">Readable version</button>
-        <button class="ghost" type="button" onclick="copyShow('json')">App-ready .json</button>
+        <button class="ghost" type="button" onclick="copyShow('json')">Your constitution (.json)</button>
+        <button class="ghost" type="button" onclick="copyShow('human')">Plain text</button>
         <button type="button" onclick="copyNow()" id="copybtn">Copy</button>
       </div>
       <label for="copytext" class="sr-only">Copyable constitution</label>
@@ -322,7 +370,15 @@
 <!-- ═══════════ FIRST STEPS + CONTINUE ═══════════ -->
 <section class="screen" id="s-steps">
   <div class="backbar"><button class="backbtn" type="button" data-back aria-label="Go back. Press and hold to choose an earlier page.">← Back</button></div>
-  <div class="wordmark">Loema</div>
+  <details class="domain wordmark">
+    <summary aria-label="loema.com — switch between loema.com and loema.org">Loema<span class="org">.com</span> <span class="caret" aria-hidden="true">&#9662;</span></summary>
+    <div class="menu">
+      <a href="https://loema.com" aria-current="true"><span class="dn-com">loema<span class="org">.com</span></span>
+        <span class="which">where you begin — the conversations</span></a>
+      <a href="https://loema.org"><span class="dn-org">loema<span class="org">.org</span></span>
+        <span class="which">where it continues — the commons</span></a>
+    </div>
+  </details>
   <h1 style="font-size:30px">Shape one part of your environment.</h1>
   <div class="first-step" id="first-step" style="margin-top:20px">
     <h2 class="sans" id="stepshead" style="font-size:13px;letter-spacing:.14em;text-transform:uppercase;color:var(--accent);margin-bottom:10px"></h2>
@@ -355,7 +411,21 @@
 
   <div class="waitbox">
     <h2 class="stay-title">Stay tuned</h2>
-    <p style="font-size:16px;margin-bottom:14px">An app is coming that can act on this constitution — and more questions are on the way.</p>
+    <p style="font-size:16px;margin-bottom:14px">An app is coming that can act on this constitution. And this was the first of eight conversations.</p>
+    <details class="rounds" style="margin:0 0 18px">
+      <summary>The eight, in the order they arrive</summary>
+      <ol class="roundlist">
+        <li><span class="rn">The first conversation</span><span class="rs">the one you just had</span></li>
+        <li><span class="rn">Feeds</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Data</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Attention</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Retention</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Sharing</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Participation</span><span class="rs">not yet</span></li>
+        <li><span class="rn">Self</span><span class="rs">not yet — builds on your first</span></li>
+      </ol>
+      <p class="terms">They arrive one at a time, with no dates and no rush. When one opens, bring the file you keep.</p>
+    </details>
     <label for="updateemail" class="sr-only">Email address</label>
     <input type="email" id="updateemail" autocomplete="email" inputmode="email" placeholder="your@email.com" style="max-width:340px">
     <div class="navrow"><button class="ghost" type="button" onclick="joinUpdates()">Stay in the conversation</button></div>
@@ -790,9 +860,6 @@ function buildConstitution(){
     const tag=document.createElement('div');tag.className='tag';tag.textContent=`drafted in the ${REGISTER_LABEL[S.register]} voice you chose — edit freely`;div.appendChild(tag);
     wrap.appendChild(div);
   });
-  const safe=document.getElementById('safeguard');safe.textContent='';
-  const bold=document.createElement('b');bold.textContent='Held open for you — not your words, ours: ';safe.appendChild(bold);
-  safe.appendChild(document.createTextNode("Storage stays local-first until you decide otherwise. You weren't asked about storage today, so this protection is labeled rather than passed off as your answer."));
   document.getElementById('standby').checked=false;
   document.getElementById('standby-note').textContent='';
   S.stageReached.constitution=true;
@@ -877,18 +944,18 @@ function chooseHelp(mode){S.disposition=mode;S.stageReached.steps=true;buildStep
 // ————— OUTPUTS —————
 function doc(){
   return {
-    "$schema":"https://loema.org/constitution/v2","namespace":"personal",
+    "$schema":"https://loema.org/constitution/schema","namespace":"personal",
     title:"My Personal Constitution",
+    notice:"This document is private. No one from Loema will ever ask you to send it.",
     author:{display_name:S.authorName||null,source:S.authorName?"authored":"withheld"},
     preamble:{text:S.preamble,register:S.register,source:"authored"},
     articles:Object.fromEntries(DOMS.map(d=>["personal."+d,S.articles[d]])),
-    loema_safeguards:{storage:"local_first",note:"Protections Loema applies until you decide. Not your words — ours, held open for you."},
     through_line:{text:S.thread,verdict:S.threadVerdict,source:S.threadSource},
     personal_focus:{text:protectedThing(),source:S.P===4?"authored":"generated_from_response",evidence:["q3","q4"]},
     dispositions:{setup:S.disposition,source:"generated_from_response",evidence:["post_witness_founder_question"]},
     review:{cadence:"seasonal"},exceptions:[],amendments:[],
     signature:Object.assign({confirmed:true,witnessed_at_local:S.witnessedAt},S.ringMemory||{}),
-    provenance:{instrument:"loema-litmus-v5",stored_by_loema:false}
+    provenance:{instrument:"loema.com",stored_by_loema:false}
   };
 }
 function dl(name,text,mime){const a=document.createElement('a');
@@ -900,14 +967,15 @@ function humanText(){
   DOMS.forEach(dom=>{const a=S.articles[dom];
     out+=`${DOMLABEL[dom].toUpperCase()}\n${a.rule}\n(${a.amended?'authored by me':'drafted from my answers, confirmed by me'})\n\n`;});
   const w=sealWord();
-  out+=`THE THREAD\n${S.thread}\n\nHELD OPEN BY LOEMA (not my words)\nStorage: local-first until I decide.\n\n${w[0].toUpperCase()+w.slice(1)} by me, ${new Date(S.witnessedAt).toDateString()}.\nThis document lives with me. Loema kept nothing.  ⦿\n`;
+  out+=`THE THREAD\n${S.thread}\n\n${w[0].toUpperCase()+w.slice(1)} by me, ${new Date(S.witnessedAt).toDateString()}.\nThis document lives with me. Loema kept nothing.\nThis document is private. No one from Loema will ever ask you to send it.  ⦿\n`;
   return out;}
 function preambleText(){
   const d=doc();
-  return `# PERSONAL CONSTITUTION — AI PREAMBLE\n# This gives an AI context; it does not override system or provider rules.\n# The provider may receive and retain anything pasted here.\n\nThese are my preferences for this conversation. Follow them where they do not conflict with system, provider, safety, or legal requirements. If you cannot follow one, tell me plainly before continuing.\n\n${S.authorName?`Call me: ${S.authorName}\n\n`:''}My own words: “${fullPreamble()}”\n\nWhat I am protecting: ${S.P===4&&S.Ptext?S.Ptext.trim():protectedRefFirstPerson()}.\n\nMy terms:\n`+DOMS.map(dom=>`- ${DOMLABEL[dom]}: ${S.articles[dom].rule}`).join('\n')+
+  return `# PERSONAL CONSTITUTION — AI PREAMBLE\n# This gives an AI context; it does not override system or provider rules.\n# The provider may receive and retain anything pasted here.\n# This document is private. No one from Loema will ever ask you to send it.\n\nThese are my preferences for this conversation. Follow them where they do not conflict with system, provider, safety, or legal requirements. If you cannot follow one, tell me plainly before continuing.\n\n${S.authorName?`Call me: ${S.authorName}\n\n`:''}My own words: “${fullPreamble()}”\n\nWhat I am protecting: ${S.P===4&&S.Ptext?S.Ptext.trim():protectedRefFirstPerson()}.\n\nMy terms:\n`+DOMS.map(dom=>`- ${DOMLABEL[dom]}: ${S.articles[dom].rule}`).join('\n')+
   `\n\nDo not silently imply that these terms outrank rules you must follow. Name any conflict clearly and let me decide whether to continue.\n\n(Prepared by Loema. Stored only by its author. ${new Date().toDateString()})`;}
-function dlJSON(){dl('my-constitution.json',JSON.stringify(doc(),null,2),'application/json');}
-function dlHuman(){dl('my-constitution.txt',humanText(),'text/plain');}
+function saveName(ext){return (S.authorName?S.authorName+"'s":'my')+' constitution.'+ext;}
+function dlJSON(){dl(saveName('json'),JSON.stringify(doc(),null,2),'application/json');}
+function dlHuman(){dl(saveName('txt'),humanText(),'text/plain');}
 function dlPreamble(){dl('ai-preamble.txt',preambleText(),'text/plain');}
 function toggleKeep(){
   const kp=document.getElementById('keeppanel'),b=document.getElementById('keepbtn');
@@ -915,7 +983,7 @@ function toggleKeep(){
   b.setAttribute('aria-expanded',open?'true':'false');}
 function toggleCopyPanel(){const cp=document.getElementById('copypanel');
   const open=cp.style.display==='none';cp.style.display=open?'block':'none';
-  if(open)copyShow('human');}
+  if(open)copyShow('json');}
 function copyShow(kind){
   const t=document.getElementById('copytext');
   t.value=kind==='json'?JSON.stringify(doc(),null,2):humanText();
@@ -1222,8 +1290,7 @@ function documentCanvases(){
   addSection('What these terms protect',protectionSentenceFirstPerson());
   DOMS.forEach(dom=>addSection(DOMLABEL[dom],S.articles[dom].rule));
   addSection('The thread',S.thread);
-  addSection('Held open by Loema — not my words','Storage stays local-first until you decide otherwise.');
-  addSection(sealWord()==='ratified'?'Ratification':'Witness',`${sealWord()[0].toUpperCase()+sealWord().slice(1)} by ${S.authorName||'the author'} on ${new Date(S.witnessedAt).toLocaleString()}. Loema kept nothing.`);
+  addSection(sealWord()==='ratified'?'Ratification':'Witness',`${sealWord()[0].toUpperCase()+sealWord().slice(1)} by ${S.authorName||'the author'} on ${new Date(S.witnessedAt).toLocaleString()}. Loema kept nothing. This document is private. No one from Loema will ever ask you to send it.`);
   pageObjs.push(page);
   pageObjs.forEach((pg,i)=>{
     const x=pg.x;x.textAlign='right';x.fillStyle='#566052';
@@ -1291,9 +1358,9 @@ function dlPersonalConstitution(){
   const status=document.getElementById('download-status');
   try{
     const pdf=imagePDF(documentCanvases()),url=URL.createObjectURL(new Blob([pdf],{type:'application/pdf'}));
-    const a=document.createElement('a');a.href=url;a.download='my-personal-constitution.pdf';a.click();
+    const a=document.createElement('a');a.href=url;a.download=saveName('pdf');a.click();
     setTimeout(()=>URL.revokeObjectURL(url),1500);
-    status.textContent='Downloaded: shareable cover and full constitution in one designed PDF.';
+    status.textContent='Downloaded: a copy to read — the cover and your constitution in one PDF.';
   }catch(error){
     status.textContent='The designed download was blocked here. Use “Trouble downloading?” for a copyable version.';
   }
